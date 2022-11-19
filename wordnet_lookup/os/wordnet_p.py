@@ -16,14 +16,14 @@
 # #########################################################
 
 wordnet_terms_p_provenance = {
- 'action': ['router.py',
-            'plac_core.py',
-            'csv2py_orchestrator.py',
-            'wordnet2py.py',
-            'csv_list_writer.py',
-            'common_utils.py'],
- 'source': 'resources/data/csv/wordnet.csv',
- 'time': '2022-05-17 17:00:36.204958'}
+    'action': ['router.py',
+               'plac_core.py',
+               'csv2py_orchestrator.py',
+               'wordnet2py.py',
+               'csv_list_writer.py',
+               'common_utils.py'],
+    'source': 'resources/data/csv/wordnet.csv',
+    'time': '2022-05-17 17:00:36.204958'}
 
 wordnet_terms_p = [
     'pa',
