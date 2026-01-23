@@ -1,6 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: UTF-8 -*-
-""" Facade to find Wordnet Data on Disk """
+""" O(1) WordNet term validation via hash-based lookup """
 
 import hashlib
 import importlib
@@ -28,20 +28,12 @@ def _hash_exists(input_text: str) -> bool:
 
 
 class FindWordnet:
-    """ Facade to find Wordnet Data on Disk """
+    """
+    O(1) WordNet term lookup using hash-based frozenset buckets.
 
-    def __init__(self):
-        """
-        Created:
-            5-Oct-2021
-            craigtrim@gmail.com
-            *   https://github.com/grafflr/graffl-core/issues/2
-        Updated:
-            31-Aug-2022
-            craigtrim@gmail.com
-            *   migrate to solo repo
-        """
-        pass
+    Uses MD5 hashing with lazy-loaded modules for fast membership testing
+    against 88,013 WordNet terms.
+    """
 
     def exists(self, input_text: str) -> bool:
         input_text = input_text.lower().strip()

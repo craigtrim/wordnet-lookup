@@ -8,13 +8,9 @@
 [![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/craigtrim/wordnet-lookup)
 
-**WordNet lookups in microseconds. No database. No downloads. No complexity.**
+**Is this token a word? O(1) answer. No setup. No dependencies.**
 
-Stop waiting for database queries or corpus downloads. `wordnet-lookup` gives you instant WordNet term validation using pre-compiled static dictionaries. One import, one function call, zero hassle.
-
-## Why This Exists
-
-Traditional WordNet interfaces (NLTK, WordNet database) require corpus downloads, database connections, and I/O operations. For simple term validation, that's overkill. This library eliminates all of that by embedding WordNet terms directly in Python dictionaries. The result? Lookups in microseconds with zero external dependencies.
+A simple question deserves a simple answer. This library gives you instant yes/no validation against 88,000 common English words from the Princeton WordNet lexicon.
 
 ## Quick Start
 
@@ -47,22 +43,48 @@ is_wordnet_term('ALPHA')        # True
 - **Smart Plurals** - Automatically checks singular forms
 - **Simple API** - One function does it all
 
-## What This Library Does (and Doesn't Do)
+## The Problem This Solves
 
-**Does:**
-- Validates whether a term exists in WordNet 3.0
-- Handles basic plural forms automatically
-- Works offline with zero external dependencies
+In NLP, you frequently need to answer the question: **"Is this token a real word?"**
 
-**Doesn't:**
-- Provide definitions, synonyms, or semantic relationships (use NLTK for that)
-- Include very recent terms, slang, or proper nouns (WordNet 3.0 is from 2006)
-- Update automatically with new WordNet versions (static snapshot)
-- Perform spell-checking or suggestions
+Not "what does it mean?" Not "give me synonyms." Just: is this a word?
 
-**Use this when:** You need fast term validation for NLP preprocessing, filtering, or validation.
+<table>
+<tr>
+<td align="center"><code>is_wordnet_term('computer')</code></td>
+<td align="center"><code>is_wordnet_term('asdfgh')</code></td>
+</tr>
+<tr>
+<td align="center"><img src="docs/images/yes-hot-dog.png" width="180"></td>
+<td align="center"><img src="docs/images/not-hot-dog.png" width="180"></td>
+</tr>
+<tr>
+<td align="center"><code>True</code></td>
+<td align="center"><code>False</code></td>
+</tr>
+</table>
 
-**Don't use this when:** You need definitions, synsets, semantic networks, or comprehensive spell-checking.
+That's it. O(1) response. No ambiguity.
+
+## Why WordNet?
+
+WordNet isn't the OED (too academic). It's not Urban Dictionary (too ephemeral). It's not a web scrape (too noisy).
+
+It's a **curated lexicon of ~88,000 common English words** maintained by Princeton linguists. The kind of words that appear in newspapers, textbooks, and everyday conversation. If a token passes the WordNet test, you can be confident it's a legitimate, widely-recognized English word.
+
+## When to Use This
+
+- **Tokenization filtering**: Keep real words, discard garbage
+- **Input validation**: Reject nonsense in user input
+- **NLP preprocessing**: Filter candidates before expensive operations
+- **Spell-check pre-filtering**: Quick reject obvious non-words before fuzzy matching
+- **Data cleaning**: Identify malformed or corrupted text
+
+## What This Doesn't Do
+
+- No definitions, synonyms, or semantic relationships (use spaCy for that)
+- No slang, proper nouns, or recent coinages (WordNet is from 2006)
+- No spell-checking or suggestions (just yes/no)
 
 ## Documentation
 
