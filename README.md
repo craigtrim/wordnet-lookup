@@ -88,13 +88,7 @@ It's a **curated lexicon of ~88,000 common English words** maintained by Princet
 
 ## Documentation
 
-For detailed usage, performance benchmarks, and advanced features, see the [API Documentation](docs/API.md).
-
-## How It Works
-
-WordNet terms are stored as MD5 hash suffixes in 256 `frozenset` buckets (by first two hex characters of the hash). Lookups hash the input, route to the correct bucket, and perform O(1) set membership. Modules are lazy-loaded on first access per bucket.
-
-For the gory details, see [Implementation Notes](docs/IMPLEMENTATION.md).
+For detailed usage, performance benchmarks, implementation details, and advanced features, see the [API Documentation](docs/API.md).
 
 ## Development
 
@@ -123,6 +117,10 @@ This package contains data derived from Princeton WordNet 3.0 (2006):
 > WordNet 3.0 Copyright 2006 by Princeton University. All rights reserved.
 
 **Note:** This is a static snapshot of WordNet 3.0. The data is not automatically updated with newer WordNet releases.
+
+## See Also
+
+- **[bnc-lookup](https://github.com/craigtrim/bnc-lookup)** - Similar O(1) lookup for British National Corpus frequency data
 
 ## Links
 
