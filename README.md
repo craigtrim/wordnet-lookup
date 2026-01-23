@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/wordnet-lookup.svg)](https://pypi.org/project/wordnet-lookup/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/wordnet-lookup.svg)](https://pypi.org/project/wordnet-lookup/)
 [![Python versions](https://img.shields.io/pypi/pyversions/wordnet-lookup.svg)](https://pypi.org/project/wordnet-lookup/)
-[![License](https://img.shields.io/badge/License-MIT%20%2B%20WordNet-yellow.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT%20%2B%20WordNet-yellow.svg)](https://github.com/craigtrim/wordnet-lookup/blob/master/LICENSE)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/craigtrim/wordnet-lookup)
@@ -88,7 +88,7 @@ It's a **curated lexicon of ~88,000 common English words** maintained by Princet
 
 ## Documentation
 
-For detailed usage, performance benchmarks, implementation details, and advanced features, see the [API Documentation](docs/API.md).
+For detailed usage, performance benchmarks, implementation details, and advanced features, see the [API Documentation](https://github.com/craigtrim/wordnet-lookup/blob/master/docs/API.md).
 
 ## Development
 
@@ -98,7 +98,7 @@ cd wordnet-lookup
 make all      # Full build pipeline
 ```
 
-See [API Documentation](docs/API.md) for detailed development information.
+See [API Documentation](https://github.com/craigtrim/wordnet-lookup/blob/master/docs/API.md) for detailed development information.
 
 ## License
 
@@ -106,7 +106,7 @@ This package is dual-licensed:
 - **Software**: MIT License
 - **WordNet Data**: Princeton WordNet License
 
-See [LICENSE](LICENSE) for complete terms.
+See [LICENSE](https://github.com/craigtrim/wordnet-lookup/blob/master/LICENSE) for complete terms.
 
 ## Attribution
 
