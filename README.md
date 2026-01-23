@@ -1,7 +1,8 @@
 # WordNet Lookup
 
-[![PyPI version](https://badge.fury.io/py/wordnet-lookup.svg)](https://badge.fury.io/py/wordnet-lookup)
-[![Python](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI version](https://img.shields.io/pypi/v/wordnet-lookup.svg)](https://pypi.org/project/wordnet-lookup/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/wordnet-lookup.svg)](https://pypi.org/project/wordnet-lookup/)
+[![Python versions](https://img.shields.io/pypi/pyversions/wordnet-lookup.svg)](https://pypi.org/project/wordnet-lookup/)
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20WordNet-yellow.svg)](LICENSE)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
