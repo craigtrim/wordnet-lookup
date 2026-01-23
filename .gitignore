@@ -58,6 +58,7 @@ _modules
 *.zip
 
 poetry.lock
+requirements.txt
 config.ps1
 ~$emojis.xlsx
 publish_to_pypi.ps1
