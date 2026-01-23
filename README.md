@@ -95,8 +95,6 @@ For detailed usage, performance benchmarks, implementation details, and advanced
 ```bash
 git clone https://github.com/craigtrim/wordnet-lookup.git
 cd wordnet-lookup
-make install  # Install dependencies
-make test     # Run tests
 make all      # Full build pipeline
 ```
 
@@ -120,7 +118,7 @@ This package contains data derived from Princeton WordNet 3.0 (2006):
 
 ## See Also
 
-- **[bnc-lookup](https://github.com/craigtrim/bnc-lookup)** - Similar O(1) lookup for British National Corpus frequency data
+- **[bnc-lookup](https://github.com/craigtrim/bnc-lookup)** - Similar O(1) lookup using the British National Corpus (BNC)
 
 ## Links
 
