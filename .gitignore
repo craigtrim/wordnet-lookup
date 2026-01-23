@@ -65,3 +65,4 @@ publish_to_pypi.ps1
 pypi.key
 .claude
 builder/
+config.sh
