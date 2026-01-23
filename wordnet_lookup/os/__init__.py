@@ -24,3 +24,32 @@ from .wordnet_w import wordnet_terms_w
 from .wordnet_x import wordnet_terms_x
 from .wordnet_y import wordnet_terms_y
 from .wordnet_z import wordnet_terms_z
+
+__all__ = [
+    'wordnet_terms_a',
+    'wordnet_terms_b',
+    'wordnet_terms_c',
+    'wordnet_terms_d',
+    'wordnet_terms_e',
+    'wordnet_terms_f',
+    'wordnet_terms_g',
+    'wordnet_terms_h',
+    'wordnet_terms_i',
+    'wordnet_terms_j',
+    'wordnet_terms_k',
+    'wordnet_terms_l',
+    'wordnet_terms_m',
+    'wordnet_terms_n',
+    'wordnet_terms_o',
+    'wordnet_terms_p',
+    'wordnet_terms_q',
+    'wordnet_terms_r',
+    'wordnet_terms_s',
+    'wordnet_terms_t',
+    'wordnet_terms_u',
+    'wordnet_terms_v',
+    'wordnet_terms_w',
+    'wordnet_terms_x',
+    'wordnet_terms_y',
+    'wordnet_terms_z',
+]

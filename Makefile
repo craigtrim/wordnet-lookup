@@ -41,12 +41,17 @@ build:
 linters:
 	@echo "Running Linters"
 	poetry run pre-commit run --all-files
-	poetry run flakeheaven lint
+	poetry run ruff check .
 
 freeze:
 	@echo "Freezing Requirements"
 	poetry run pip freeze > requirements.txt
 	poetry run python -m pip install --upgrade pip
+
+pyc:
+	@echo "Cleaning Python bytecode files"
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 
 all:
 	make build
