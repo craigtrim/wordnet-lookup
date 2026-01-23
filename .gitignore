@@ -61,3 +61,5 @@ poetry.lock
 config.ps1
 ~$emojis.xlsx
 publish_to_pypi.ps1
+pypi.key
+.claude

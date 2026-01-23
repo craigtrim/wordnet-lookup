@@ -11,27 +11,42 @@ maintainers = [
 description = "Static Dictionaries for Rapid Wordnet Lookups"
 name = "wordnet-lookup"
 readme = "README.md"
-version = "0.1.2"
+version = "1.0.0"
+license = "MIT"
 
-keywords = ["wordnet", "lexicon"]
+keywords = [
+  "wordnet",
+  "lexicon",
+  "nlp",
+  "natural-language-processing",
+  "dictionary",
+  "vocabulary",
+  "validation",
+  "linguistics",
+]
+
 repository = "https://github.com/craigtrim/wordnet-lookup"
 
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Text Processing :: Linguistic",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
 ]
 
 [tool.poetry.build]
 generate-setup-file = true
 
 [tool.poetry.dependencies]
-baseblock = "*"
-python = "^3.8.5"
+python = "^3.7"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "*"
-flakeheaven = "*"
+ruff = "*"
 plac = "*"
 pre-commit = "^2.20.0"
 pytest = "*"
@@ -39,6 +54,12 @@ pytest = "*"
 [build-system]
 build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core>=1.0.0"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+ignore = ["F403", "F405"]
 
 [tool.mypy]
 enable_error_code = [
