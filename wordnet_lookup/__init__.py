@@ -1,4 +1,3 @@
-from .os import *
 from .find_wordnet import FindWordnet
 
 
