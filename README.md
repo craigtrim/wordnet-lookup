@@ -55,8 +55,8 @@ Not "what does it mean?" Not "give me synonyms." Just: is this a word?
 <td align="center"><code>is_wordnet_term('asdfgh')</code></td>
 </tr>
 <tr>
-<td align="center"><img src="docs/images/yes-hot-dog.png" width="180"></td>
-<td align="center"><img src="docs/images/not-hot-dog.png" width="180"></td>
+<td align="center"><img src="https://raw.githubusercontent.com/craigtrim/wordnet-lookup/master/docs/images/yes-hot-dog.png" width="180"></td>
+<td align="center"><img src="https://raw.githubusercontent.com/craigtrim/wordnet-lookup/master/docs/images/not-hot-dog.png" width="180"></td>
 </tr>
 <tr>
 <td align="center"><code>True</code></td>
