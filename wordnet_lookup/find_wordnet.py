@@ -5,10 +5,6 @@
 
 from string import ascii_lowercase
 
-
-from baseblock import BaseObject
-
-
 from wordnet_lookup.os import wordnet_terms_a
 from wordnet_lookup.os import wordnet_terms_b
 from wordnet_lookup.os import wordnet_terms_c
@@ -37,7 +33,7 @@ from wordnet_lookup.os import wordnet_terms_y
 from wordnet_lookup.os import wordnet_terms_z
 
 
-class FindWordnet(BaseObject):
+class FindWordnet:
     """ Facade to find Wordnet Data on Disk """
 
     def __init__(self):
@@ -51,7 +47,7 @@ class FindWordnet(BaseObject):
             craigtrim@gmail.com
             *   migrate to solo repo
         """
-        BaseObject.__init__(self, __name__)
+        pass
 
     @staticmethod
     def _exists(input_text: str) -> bool:
