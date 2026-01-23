@@ -82,47 +82,6 @@ is_wordnet_term('computers')    # True
 is_wordnet_term('databases')    # True
 ```
 
-## Direct Dictionary Access
-
-Access specific alphabetically-organized dictionaries for advanced use cases:
-
-```python
-from wordnet_lookup.os import wordnet_terms_a, wordnet_terms_b
-
-# Check directly in the 'a' dictionary
-if 'alpha' in wordnet_terms_a:
-    print("Found in A dictionary")
-
-# Access multiple dictionaries
-from wordnet_lookup.os import (
-    wordnet_terms_a,
-    wordnet_terms_b,
-    wordnet_terms_c
-)
-
-# Batch check within specific letter range
-words_to_check = ['alpha', 'beta', 'charlie']
-results = {
-    'alpha': 'alpha' in wordnet_terms_a,
-    'beta': 'beta' in wordnet_terms_b,
-    'charlie': 'charlie' in wordnet_terms_c
-}
-```
-
-### Available Dictionaries
-
-Each module exports a dictionary for its letter:
-
-```python
-# Import pattern: wordnet_terms_{letter}
-from wordnet_lookup.os import (
-    wordnet_terms_a,  # Words starting with 'a'
-    wordnet_terms_b,  # Words starting with 'b'
-    # ... through ...
-    wordnet_terms_z   # Words starting with 'z'
-)
-```
-
 ## Performance
 
 The library is optimized for speed with zero I/O overhead. All lookups are performed against pre-compiled dictionaries:
@@ -168,10 +127,11 @@ Traditional WordNet interfaces require:
 
 ### Architecture
 
-1. **Alphabetical Organization**: WordNet terms are pre-compiled into 26 separate dictionaries (A-Z)
-2. **First Character Routing**: Lookups route to the appropriate dictionary based on the first character
-3. **Plural Handling**: If a word isn't found and ends with 's', the singular form is checked
-4. **Case Insensitive**: All inputs are normalized to lowercase
+1. **Hash-Based Storage**: WordNet terms are stored as MD5 hash suffixes in 256 `frozenset` buckets
+2. **Bucket Routing**: The first 2 hex characters of the hash determine the bucket (00-ff)
+3. **Lazy Loading**: Hash modules are imported on-demand and cached
+4. **Plural Handling**: If a word isn't found and ends with 's', the singular form is checked
+5. **Case Insensitive**: All inputs are normalized to lowercase
 
 ### Lookup Flow
 
@@ -179,17 +139,20 @@ Traditional WordNet interfaces require:
 # When you call: is_wordnet_term('Alpha')
 
 1. Normalize: 'Alpha' -> 'alpha'
-2. Get first char: 'a'
-3. Route to: wordnet_terms_a
-4. Check: 'alpha' in wordnet_terms_a
-5. If not found and ends with 's':
-   - Try singular: 'alph' in wordnet_terms_a
-6. Return: True/False
+2. Hash: MD5('alpha') -> 'e9c...2d1'
+3. Split: prefix='e9', suffix='c...2d1'
+4. Load bucket: import h_e9.py (if not cached)
+5. Check: suffix in hashes_e9  # O(1) frozenset lookup
+6. If not found and ends with 's':
+   - Repeat for singular form
+7. Return: True/False
 ```
 
 ### Data Source
 
-The static dictionaries are pre-compiled from the Princeton WordNet corpus, containing all valid WordNet terms organized alphabetically for optimal lookup performance.
+The hash files are pre-compiled from the Princeton WordNet corpus (88,013 unique terms).
+
+For detailed implementation notes, see [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
 ## Project Structure
 
@@ -198,15 +161,19 @@ wordnet-lookup/
 ├── wordnet_lookup/
 │   ├── __init__.py           # Main API exports
 │   ├── find_wordnet.py       # Core lookup logic
-│   └── os/
-│       ├── __init__.py       # Dictionary exports
-│       ├── wordnet_a.py      # Terms starting with 'a'
-│       ├── wordnet_b.py      # Terms starting with 'b'
-│       └── ...               # Through 'z'
+│   └── hs/
+│       ├── __init__.py       # Hash module exports
+│       ├── h_00.py           # Hashes with prefix '00'
+│       ├── h_01.py           # Hashes with prefix '01'
+│       └── ...               # Through 'ff' (256 files)
+├── builder/
+│   ├── build_hash_files.py   # Generates hash files
+│   └── wordnet_words.txt     # Source word list
 ├── tests/
 │   └── wordnet_lookup_test.py
 ├── docs/
-│   └── API.md                # This file
+│   ├── API.md                # This file
+│   └── IMPLEMENTATION.md     # Technical deep-dive
 ├── pyproject.toml            # Poetry configuration
 ├── Makefile                  # Build commands
 └── README.md                 # Quick start guide

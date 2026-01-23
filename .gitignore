@@ -64,3 +64,4 @@ config.ps1
 publish_to_pypi.ps1
 pypi.key
 .claude
+builder/

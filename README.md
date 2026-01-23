@@ -70,9 +70,9 @@ For detailed usage, performance benchmarks, and advanced features, see the [API 
 
 ## How It Works
 
-WordNet terms are pre-compiled into 26 alphabetically-organized dictionaries (A-Z). Lookups route to the appropriate dictionary based on the first character, check for the term, and fall back to singular forms if needed. Everything is case-insensitive.
+WordNet terms are stored as MD5 hash suffixes in 256 `frozenset` buckets (by first two hex characters of the hash). Lookups hash the input, route to the correct bucket, and perform O(1) set membership. Modules are lazy-loaded on first access per bucket.
 
-Simple. Fast. Effective.
+For the gory details, see [Implementation Notes](docs/IMPLEMENTATION.md).
 
 ## Development
 
