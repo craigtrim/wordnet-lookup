@@ -13,6 +13,12 @@ def test_exists():
     assert is_wordnet_term('acetabulars')
 
 
+def test_unicode_normalization():
+    assert is_wordnet_term('phaéton')
+    assert is_wordnet_term('protégé')
+    assert is_wordnet_term('outré')
+
+
 def main():
     test_exists()
 
