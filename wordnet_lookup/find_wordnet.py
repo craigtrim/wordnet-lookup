@@ -4,6 +4,7 @@
 
 import hashlib
 import importlib
+import unicodedata
 
 _cache = {}
 
@@ -41,8 +42,15 @@ class FindWordnet:
         if _hash_exists(input_text):
             return True
 
-        if input_text.endswith('s') and len(input_text) > 3:
-            if _hash_exists(input_text[:-1]):
+        # Normalize unicode accents to ASCII (e.g., phaéton -> phaeton)
+        normalized = unicodedata.normalize('NFKD', input_text).encode(
+            'ascii', 'ignore').decode('ascii')
+        if normalized != input_text and _hash_exists(normalized):
+            return True
+
+        # Check plural (on normalized form)
+        if normalized.endswith('s') and len(normalized) > 3:
+            if _hash_exists(normalized[:-1]):
                 return True
 
         return False
