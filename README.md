@@ -1,12 +1,11 @@
 # WordNet Lookup
 
-[![PyPI version](https://img.shields.io/pypi/v/wordnet-lookup.svg)](https://pypi.org/project/wordnet-lookup/)
-[![PyPI downloads](https://img.shields.io/pypi/dm/wordnet-lookup.svg)](https://pypi.org/project/wordnet-lookup/)
-[![Python versions](https://img.shields.io/pypi/pyversions/wordnet-lookup.svg)](https://pypi.org/project/wordnet-lookup/)
-[![License](https://img.shields.io/badge/License-MIT%20%2B%20WordNet-yellow.svg)](https://github.com/craigtrim/wordnet-lookup/blob/master/LICENSE)
-[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
-[![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-[![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/craigtrim/wordnet-lookup)
+[![PyPI version](https://badge.fury.io/py/wordnet-lookup.svg)](https://badge.fury.io/py/wordnet-lookup)
+[![Downloads](https://pepy.tech/badge/wordnet-lookup)](https://pepy.tech/project/wordnet-lookup)
+[![Downloads/Month](https://pepy.tech/badge/wordnet-lookup/month)](https://pepy.tech/project/wordnet-lookup)
+[![Tests](https://img.shields.io/badge/tests-3-brightgreen)](https://github.com/craigtrim/wordnet-lookup/tree/master/tests)
+[![Python 3.7+](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 **Is this token a word? O(1) answer. No setup. No dependencies.**
 
