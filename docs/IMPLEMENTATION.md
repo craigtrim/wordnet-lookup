@@ -284,6 +284,140 @@ suffixes_3a = {
 
 ---
 
+## Inflectional Suffix Detection (`find_inflections.py`)
+
+### What it covers
+
+Unlike derivational suffixes (pre-computed), inflectional suffixes are detected at runtime by stripping each candidate ending and validating the recovered stem against WordNet.
+
+Inflectional endings tried (longest-first to prevent prefix shadowing):
+
+```python
+_INFLECTIONAL = ['est', 'ing', 'ed', 'es', 's']
+```
+
+Longest-first ordering matters: `est` must be tried before `s`, or `fastest` would incorrectly match on `-s` -> `fastes` (not a word) before trying `fastest` -> `fast`.
+
+### Comparative -er exclusion
+
+`-er` is intentionally absent. Without part-of-speech data, `er` is ambiguous:
+
+- Inflectional (comparative): `faster` -> `fast`
+- Derivational (agentive): `teacher` -> `teach`, `runner` -> `run`
+
+Agentive `-er` is already handled by `get_suffixes()` from pre-computed data. Including `-er` in inflectional detection would cause false positives and double-counting. Callers who need comparative forms should use POS-tagged pipelines.
+
+### Allomorphic restoration
+
+Stripping a suffix does not always yield the base form directly. Four allomorphs are tried for each stem:
+
+```
+1. Direct         : walk   (walked -> walk)
+2. E-restore      : hope   (hoped  -> hop + e)
+3. Consonant-drop : run    (running -> runn -> run)
+4. Y-restore      : happy  (happiest -> happi -> happy)
+```
+
+E-restore is only attempted for suffixes in `_E_DROP_TRIGGERS = {'ing', 'ed', 'er', 'est'}` because e-drop does not occur with `-s` or `-es`.
+
+```python
+def _candidates(stem: str, suffix: str) -> list[str]:
+    candidates = [stem]                          # 1. Direct
+    if suffix in _E_DROP_TRIGGERS:
+        candidates.append(stem + 'e')            # 2. E-restore
+    if len(stem) >= 2 and stem[-1] == stem[-2]:
+        candidates.append(stem[:-1])             # 3. Consonant-drop
+    if stem.endswith('i'):
+        candidates.append(stem[:-1] + 'y')       # 4. Y-restore
+    return candidates
+```
+
+### Lookup flow
+
+```
+Input: "running"
+    |
+    v
+Normalize: "running"
+    |
+    v
+FindWordnet().exists("running") -> True  ->  return []   (base form in WordNet)
+
+Input: "cats"
+    |
+    v
+Normalize: "cats"
+    |
+    v
+FindWordnet().exists("cats") -> False
+    |
+    v
+Try suffix 'est': "cats" does not end with 'est'
+Try suffix 'ing': "cats" does not end with 'ing'
+Try suffix 'ed':  "cats" does not end with 'ed'
+Try suffix 'es':  "cats" does not end with 'es'
+Try suffix 's':   "cats" ends with 's' -> stem = "cat"
+    Candidates: ["cat", "cate"]
+    FindWordnet().exists("cat") -> True  ->  return ['s']
+```
+
+### Why runtime rather than pre-computed?
+
+Inflectional endings form a closed set (a handful of suffixes vs. open-ended derivational morphology). The combinatorics are tractable at call time (~2-5 us per word). Pre-computing inflectional data would require storing stem mappings for every inflected form in the corpus, adding significant storage with marginal speed benefit.
+
+---
+
+## Combined Morphology (`morphology.py`)
+
+### Morphology dataclass
+
+```python
+@dataclass(frozen=True)
+class Morphology:
+    derivational: list[str]   # from get_suffixes() - pre-computed
+    inflectional: list[str]   # from get_inflections() - runtime
+```
+
+`frozen=True` makes instances hashable and immutable, allowing safe use as dict keys or in sets.
+
+### Aggregation logic
+
+```python
+def get_morphology(word: str) -> Morphology | None:
+    d = get_suffixes(word)       # None | [] | [...]
+    i = get_inflections(word)    # None | [] | [...]
+
+    if d is None and i is None:
+        return None              # Not in WordNet by either path
+
+    return Morphology(
+        derivational=d or [],
+        inflectional=i or [],
+    )
+```
+
+`None` from either function means "not found by this method," not "not in WordNet." A word may be found by `get_suffixes()` but return `None` from `get_inflections()` if no inflectional suffix can be stripped to a valid stem; both results are still valid and combined.
+
+### None vs [] contract (both fields)
+
+The same `None` vs `[]` contract that applies to `get_suffixes()` individually applies to the combined result:
+
+- `get_morphology()` returns `None` only when **both** checks fail
+- Each field within `Morphology` is always a list (never `None`)
+- An empty list in a field means "found, but no suffixes of this type"
+
+### Interaction between derivational and inflectional
+
+Derivational and inflectional suffixes are linguistically distinct layers. Derivational suffixes change word class or meaning (beautiful -> beautifully), while inflectional suffixes mark grammatical categories (cat -> cats). A word can carry both:
+
+```
+"nationalized" -> derivational: ['al', 'ize', 'ed']
+```
+
+Note: `-ed` in `nationalized` is derivational (participial adjective derivation), captured by `get_suffixes()`. In contrast, `walked` has inflectional `-ed` captured by `get_inflections()`. The pre-computed derivational data takes precedence in `get_suffixes()`.
+
+---
+
 ## Design Decisions
 
 ### Why not Bloom filters?

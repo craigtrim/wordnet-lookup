@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/wordnet-lookup.svg)](https://badge.fury.io/py/wordnet-lookup)
 [![Downloads](https://pepy.tech/badge/wordnet-lookup)](https://pepy.tech/project/wordnet-lookup)
 [![Downloads/Month](https://pepy.tech/badge/wordnet-lookup/month)](https://pepy.tech/project/wordnet-lookup)
-[![Tests](https://img.shields.io/badge/tests-549-brightgreen)](https://github.com/craigtrim/wordnet-lookup/tree/master/tests)
+[![Tests](https://img.shields.io/badge/tests-4291-brightgreen)](https://github.com/craigtrim/wordnet-lookup/tree/master/tests)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
@@ -18,7 +18,7 @@ pip install wordnet-lookup
 ```
 
 ```python
-from wordnet_lookup import is_wordnet_term, get_suffixes
+from wordnet_lookup import is_wordnet_term, get_suffixes, get_inflections, get_morphology
 
 # Word existence - O(1), no I/O
 is_wordnet_term('alpha')        # True
@@ -39,6 +39,23 @@ get_suffixes('beautifully')     # ['ful', 'ly']
 get_suffixes('nationalized')    # ['al', 'ize', 'ed']
 get_suffixes('cat')             # []   - in WordNet, no derivational suffixes
 get_suffixes('xyz123')          # None - not in WordNet
+
+# Inflectional suffix detection (runtime, not pre-computed)
+get_inflections('cats')         # ['s']
+get_inflections('running')      # ['ing']
+get_inflections('walked')       # ['ed']
+get_inflections('fastest')      # ['est']
+get_inflections('cat')          # []   - base form, no inflection
+get_inflections('xyz123')       # None - not in WordNet
+
+# Combined morphological analysis
+m = get_morphology('beautifully')
+m.derivational  # ['ful', 'ly']
+m.inflectional  # []
+
+m = get_morphology('cats')
+m.derivational  # []
+m.inflectional  # ['s']
 ```
 
 ## Features
@@ -50,6 +67,8 @@ get_suffixes('xyz123')          # None - not in WordNet
 - **Smart Plurals** - Automatically checks singular forms
 - **Unicode Normalization** - Accented forms (e.g. `naïve`, `café`) resolved to ASCII
 - **Suffix Extraction** - `get_suffixes()` returns derivational suffixes in order, or `None` if the word isn't in WordNet
+- **Inflectional Detection** - `get_inflections()` detects -s, -es, -ing, -ed, -est at runtime with allomorphic stem restoration
+- **Combined Morphology** - `get_morphology()` returns a `Morphology` dataclass with both derivational and inflectional suffix lists
 
 ## When to Use This
 

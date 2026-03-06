@@ -3,9 +3,10 @@
 ## Table of Contents
 
 - [Installation](#installation)
-- [Basic Usage](#basic-usage)
-- [Advanced Usage](#advanced-usage)
-- [Direct Dictionary Access](#direct-dictionary-access)
+- [is_wordnet_term](#is_wordnet_term)
+- [get_suffixes](#get_suffixes)
+- [get_inflections](#get_inflections)
+- [get_morphology](#get_morphology)
 - [Performance](#performance)
 - [How It Works](#how-it-works)
 - [Project Structure](#project-structure)
@@ -17,244 +18,359 @@
 pip install wordnet-lookup
 ```
 
-## Basic Usage
+---
 
-The main interface is the `is_wordnet_term()` function:
+## is_wordnet_term
 
 ```python
 from wordnet_lookup import is_wordnet_term
 
-# Check if a word exists in WordNet
+is_wordnet_term(word: str) -> bool
+```
+
+Returns `True` if `word` (or a normalized form of it) exists in the WordNet corpus.
+
+### Normalization applied
+
+1. Lowercase + strip whitespace
+2. Unicode NFKD normalization (e.g. `naïve` -> `naive`)
+3. Trailing-s plural stripping (e.g. `computers` -> `computer`), only for words longer than 3 characters
+
+### Examples
+
+```python
 is_wordnet_term('alpha')        # True
 is_wordnet_term('waddling')     # True
 is_wordnet_term('myxovirus')    # True
 is_wordnet_term('nonexistent')  # False
 
-# Validate words
-if is_wordnet_term('according'):
-    print("Valid WordNet term")
+# Case-insensitive, whitespace-tolerant
+is_wordnet_term('ALPHA')        # True
+is_wordnet_term(' alpha ')      # True
 
-# Works with various forms
-is_wordnet_term('acetabulars')  # Handles plurals automatically
+# Plurals handled automatically
+is_wordnet_term('computers')    # True
+is_wordnet_term('acetabulars')  # True
+
+# Unicode normalization
+is_wordnet_term('naïve')        # True
 ```
 
-## Advanced Usage
-
-For more control, you can use the `FindWordnet` class directly:
+### Direct class usage
 
 ```python
 from wordnet_lookup import FindWordnet
 
 finder = FindWordnet()
-exists = finder.exists('waddling')
+finder.exists('waddling')   # True
 ```
 
-### Batch Validation
+### Batch usage
 
 ```python
-from wordnet_lookup import is_wordnet_term
-
 words = ['alpha', 'beta', 'gamma', 'notaword']
-valid_words = [word for word in words if is_wordnet_term(word)]
-print(valid_words)  # ['alpha', 'beta', 'gamma']
+valid = [w for w in words if is_wordnet_term(w)]
+# ['alpha', 'beta', 'gamma']
 ```
 
-### Case Handling
+---
 
-All lookups are case-insensitive:
+## get_suffixes
 
 ```python
-is_wordnet_term('ALPHA')   # True
-is_wordnet_term('Alpha')   # True
-is_wordnet_term('alpha')   # True
+from wordnet_lookup import get_suffixes
+
+get_suffixes(word: str) -> list[str] | None
 ```
 
-### Plural Detection
+Returns pre-computed derivational suffixes for a WordNet word in innermost-first order.
 
-The library automatically handles common plural forms:
+### Return values
+
+| Return | Meaning |
+|--------|---------|
+| `['ful', 'ly']` | Word is in WordNet with derivational structure |
+| `[]` | Word is in WordNet, morphologically simple (no derivational suffixes recorded) |
+| `None` | Word is not in WordNet |
+
+`None` vs `[]` is intentional and load-bearing. Callers can use `get_suffixes()` as a single combined existence + morphology check.
+
+### Examples
 
 ```python
-# If 'acetabulars' isn't found directly, checks 'acetabular'
-is_wordnet_term('acetabulars')  # True
-
-# Works for most regular plurals
-is_wordnet_term('computers')    # True
-is_wordnet_term('databases')    # True
+get_suffixes('happiness')       # ['ness']
+get_suffixes('beautifully')     # ['ful', 'ly']
+get_suffixes('nationalized')    # ['al', 'ize', 'ed']
+get_suffixes('cat')             # []   - in WordNet, no derivational suffixes
+get_suffixes('xyz123')          # None - not in WordNet
 ```
+
+### Caller pattern
+
+```python
+suffixes = get_suffixes(word)
+
+if suffixes is None:
+    pass  # not a WordNet word - discard
+elif suffixes == []:
+    pass  # in WordNet, morphologically simple
+else:
+    pass  # in WordNet with derivational structure
+```
+
+---
+
+## get_inflections
+
+```python
+from wordnet_lookup import get_inflections
+
+get_inflections(word: str) -> list[str] | None
+```
+
+Returns inflectional suffixes for a word by detecting them at runtime against the closed set of English inflectional endings. The recovered stem is validated via WordNet existence.
+
+Unlike `get_suffixes()`, this runs at call time (not pre-computed).
+
+### Inflectional suffixes detected
+
+| Suffix | Examples | Pattern |
+|--------|----------|---------|
+| `-s` | cats, walks | plural noun, 3rd-person singular verb |
+| `-es` | boxes, matches | plural after sibilant |
+| `-ing` | running, hoping | present participle / gerund |
+| `-ed` | walked, hoped | past tense, past participle |
+| `-est` | fastest, happiest | superlative adjective |
+
+**Comparative `-er` is intentionally excluded.** Without part-of-speech data, it is indistinguishable from agentive `-er` (derivational), which is already handled by `get_suffixes()`.
+
+### Allomorphic stem restoration
+
+When a suffix is stripped, multiple candidate base forms are tried:
+
+| Allomorph | Example | Restoration |
+|-----------|---------|-------------|
+| Direct | `walked` -> `walk` | stem as-is |
+| E-restore | `hoped` -> `hope` | stem + `e` |
+| Double-consonant reduction | `running` -> `run` | deduplicate final consonant |
+| Y-restore | `happiest` -> `happy` | `i` -> `y` |
+
+### Return values
+
+| Return | Meaning |
+|--------|---------|
+| `['ing']` | Inflectional suffix detected, WordNet base form recovered |
+| `[]` | Word is itself a WordNet base form (no inflection) |
+| `None` | Word not in WordNet and no inflected base form found |
+
+### Examples
+
+```python
+get_inflections('cats')         # ['s']
+get_inflections('running')      # ['ing']
+get_inflections('walked')       # ['ed']
+get_inflections('fastest')      # ['est']
+get_inflections('boxes')        # ['es']
+get_inflections('cat')          # []   - base form
+get_inflections('xyz123')       # None - not in WordNet
+```
+
+---
+
+## get_morphology
+
+```python
+from wordnet_lookup import get_morphology, Morphology
+
+get_morphology(word: str) -> Morphology | None
+```
+
+Returns a unified morphological analysis combining derivational (pre-computed, O(1)) and inflectional (runtime) suffix detection.
+
+### Morphology dataclass
+
+```python
+@dataclass(frozen=True)
+class Morphology:
+    derivational: list[str]   # from get_suffixes()
+    inflectional: list[str]   # from get_inflections()
+```
+
+Both fields are always lists (never `None`). `None` is returned only if the word cannot be anchored to any WordNet base form by either method.
+
+### Return values
+
+| Return | Meaning |
+|--------|---------|
+| `Morphology(derivational=['ful','ly'], inflectional=[])` | Derivational word, base form |
+| `Morphology(derivational=[], inflectional=['s'])` | Simple word, inflected |
+| `Morphology(derivational=[], inflectional=[])` | Simple word, base form |
+| `None` | Not in WordNet by either check |
+
+### Examples
+
+```python
+get_morphology('beautifully')
+# Morphology(derivational=['ful', 'ly'], inflectional=[])
+
+get_morphology('happiness')
+# Morphology(derivational=['ness'], inflectional=[])
+
+get_morphology('cats')
+# Morphology(derivational=[], inflectional=['s'])
+
+get_morphology('cat')
+# Morphology(derivational=[], inflectional=[])
+
+get_morphology('xyz123')
+# None
+```
+
+### Flat suffix list
+
+```python
+m = get_morphology('cats')
+m.derivational + m.inflectional   # ['s']
+```
+
+### When to use get_morphology vs get_suffixes + get_inflections separately
+
+Use `get_morphology()` when you need both kinds of suffix data in one call. Use `get_suffixes()` alone when you only need derivational structure and want to avoid the runtime cost of inflectional detection.
+
+---
 
 ## Performance
 
-The library is optimized for speed with zero I/O overhead. All lookups are performed against pre-compiled dictionaries:
+### Complexity
 
-### Benchmark Example
+| Operation | Complexity | Typical Time |
+|-----------|------------|--------------|
+| `is_wordnet_term()` | O(1) warm | ~400 ns |
+| `get_suffixes()` | O(1) warm | ~400 ns |
+| `get_inflections()` | O(k) suffixes tried | ~2-5 us |
+| `get_morphology()` | O(k) combined | ~2-5 us |
+| First bucket load | O(n) entries | ~2 ms |
+
+`get_inflections()` and `get_morphology()` are slower than `get_suffixes()` because they run WordNet lookups at call time rather than returning pre-computed data.
+
+### Benchmark
 
 ```python
 import time
 from wordnet_lookup import is_wordnet_term
 
-# Single lookup benchmark
 start = time.perf_counter()
 result = is_wordnet_term('myxovirus')
 elapsed = time.perf_counter() - start
 print(f"Lookup time: {elapsed*1000:.6f}ms")  # Typically microseconds
-
-# Batch lookup benchmark
-words = ['alpha', 'beta', 'gamma', 'delta', 'epsilon']
-start = time.perf_counter()
-results = [is_wordnet_term(word) for word in words]
-elapsed = time.perf_counter() - start
-print(f"Batch lookup time: {elapsed*1000:.6f}ms for {len(words)} words")
 ```
 
-### Performance Characteristics
+### Memory
 
-- **Lookup Complexity**: O(1) - Direct dictionary access
-- **Memory**: All dictionaries loaded at import (one-time cost)
-- **I/O Operations**: Zero - No file system or database access
-- **Typical Latency**: Microseconds per lookup
+| Scenario | Approximate Memory |
+|----------|--------------------|
+| Cold start (no lookups) | ~0 MB |
+| 1 bucket loaded | ~0.07 MB |
+| All 256 hs/ buckets loaded | ~7 MB |
+| All 256 sx/ buckets loaded | ~5 MB |
 
-### Comparison with Traditional WordNet
-
-Traditional WordNet interfaces require:
-- Database connections or file I/O
-- NLTK corpus downloads
-- Multiple filesystem lookups
-- Synset traversal overhead
-
-`wordnet-lookup` eliminates all of these by using pre-compiled static dictionaries.
+---
 
 ## How It Works
 
 ### Architecture
 
-1. **Hash-Based Storage**: WordNet terms are stored as MD5 hash suffixes in 256 `frozenset` buckets
-2. **Bucket Routing**: The first 2 hex characters of the hash determine the bucket (00-ff)
-3. **Lazy Loading**: Hash modules are imported on-demand and cached
-4. **Plural Handling**: If a word isn't found and ends with 's', the singular form is checked
-5. **Case Insensitive**: All inputs are normalized to lowercase
+1. **Hash-Based Storage**: WordNet terms are stored as MD5 hash suffixes in 256 `frozenset` buckets (`hs/`)
+2. **Suffix Data**: Derivational suffixes stored as pipe-delimited strings in 256 `dict` buckets (`sx/`)
+3. **Inflectional Detection**: Runtime suffix stripping with allomorphic restoration against WordNet
+4. **Bucket Routing**: First 2 hex characters of the MD5 hash determine the bucket (00-ff)
+5. **Lazy Loading**: All modules imported on-demand and cached
+6. **Plural Handling**: If a word is not found and ends with `s`, the singular form is checked
+7. **Case Insensitive**: All inputs normalized to lowercase
 
-### Lookup Flow
+For a detailed technical deep-dive, see [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
-```python
-# When you call: is_wordnet_term('Alpha')
-
-1. Normalize: 'Alpha' -> 'alpha'
-2. Hash: MD5('alpha') -> 'e9c...2d1'
-3. Split: prefix='e9', suffix='c...2d1'
-4. Load bucket: import h_e9.py (if not cached)
-5. Check: suffix in hashes_e9  # O(1) frozenset lookup
-6. If not found and ends with 's':
-   - Repeat for singular form
-7. Return: True/False
-```
-
-### Data Source
-
-The hash files are pre-compiled from the Princeton WordNet corpus (88,013 unique terms).
-
-For detailed implementation notes, see [IMPLEMENTATION.md](IMPLEMENTATION.md).
+---
 
 ## Project Structure
 
 ```
 wordnet-lookup/
 ├── wordnet_lookup/
-│   ├── __init__.py           # Main API exports
-│   ├── find_wordnet.py       # Core lookup logic
-│   └── hs/
-│       ├── __init__.py       # Hash module exports
-│       ├── h_00.py           # Hashes with prefix '00'
-│       ├── h_01.py           # Hashes with prefix '01'
-│       └── ...               # Through 'ff' (256 files)
+│   ├── __init__.py              # Public API exports
+│   ├── find_wordnet.py          # Core hash existence lookup
+│   ├── find_suffixes.py         # Derivational suffix lookup (polars, parquet)
+│   ├── find_inflections.py      # Runtime inflectional suffix detection
+│   ├── morphology.py            # Morphology dataclass + get_morphology()
+│   ├── hs/                      # 256 frozenset hash buckets (existence)
+│   │   ├── h_00.py
+│   │   └── ...                  # Through h_ff.py
+│   └── sx/                      # 256 dict hash buckets (suffix data)
+│       ├── sx_00.py
+│       └── ...                  # Through sx_ff.py
 ├── builder/
-│   ├── build_hash_files.py   # Generates hash files
-│   └── wordnet_words.txt     # Source word list
+│   ├── build_hash_files.py      # Generates hs/ modules
+│   └── wordnet_words.txt        # Source word list (88,013 words)
 ├── tests/
+│   ├── find_inflections_test.py
+│   ├── find_suffixes_test.py
+│   ├── find_wordnet_test.py
+│   ├── morphology_test.py
 │   └── wordnet_lookup_test.py
 ├── docs/
-│   ├── API.md                # This file
-│   └── IMPLEMENTATION.md     # Technical deep-dive
-├── pyproject.toml            # Poetry configuration
-├── Makefile                  # Build commands
-└── README.md                 # Quick start guide
+│   ├── API.md                   # This file
+│   └── IMPLEMENTATION.md        # Technical deep-dive
+├── pyproject.toml
+├── Makefile
+└── README.md
 ```
+
+---
 
 ## Development
 
 ### Setup
 
 ```bash
-# Clone the repository
 git clone https://github.com/craigtrim/wordnet-lookup.git
 cd wordnet-lookup
-
-# Install dependencies
 make install
 ```
 
 ### Running Tests
 
 ```bash
-# Run tests
-make test
-
-# Run full build (install, test, lint, build)
-make all
+make test      # Run pytest (4291 tests)
+make all       # Full build pipeline
 ```
 
 ### Code Quality
 
-The project uses modern Python tooling:
-
 - **Ruff**: Fast Python linter
-- **Pre-commit**: Git hooks for code quality
+- **Pre-commit**: Git hooks
 - **Autopep8**: Code formatting
 - **Pytest**: Testing framework
 
 ```bash
-# Run linters
 make linters
-
-# Run pre-commit hooks
 poetry run pre-commit run --all-files
 ```
 
-### Makefile Targets
-
-```bash
-make install   # Install dependencies
-make test      # Run pytest
-make linters   # Run ruff and autopep8
-make build     # Build distribution
-make publish   # Publish to PyPI
-make all       # Full build pipeline
-```
+---
 
 ## Requirements
 
 - Python 3.7+
-- No external dependencies
+- No external dependencies for existence lookup
+- `polars` required only for `get_suffixes()` (suffix parquet loading)
 
-## Contributing
-
-Contributions are welcome! Please ensure:
-
-1. All tests pass: `make test`
-2. Code passes linting: `make linters`
-3. Pre-commit hooks are satisfied
+---
 
 ## License
 
-This package is dual-licensed:
+Dual-licensed:
+
 - **Software**: MIT License
 - **WordNet Data**: Princeton WordNet License
 
-See [LICENSE](../LICENSE) for complete terms.
-
-### Attribution
-
-This package contains data derived from Princeton WordNet:
-
 > WordNet 3.0 Copyright 2006 by Princeton University. All rights reserved.
-
-For more information about WordNet, visit [wordnet.princeton.edu](https://wordnet.princeton.edu)
