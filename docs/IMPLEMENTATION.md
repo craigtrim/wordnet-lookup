@@ -21,16 +21,16 @@ The library has two parallel lookup systems, both using the same structural patt
 
 The original implementation used 26 Python lists organized alphabetically (A-Z). Two problems:
 
-1. **O(n) lookups** — `in` on a Python list scans linearly
-2. **Uneven distribution** — the `'s'` bucket had 9,389 entries; `'x'` had 171
+1. **O(n) lookups** - `in` on a Python list scans linearly
+2. **Uneven distribution** - the `'s'` bucket had 9,389 entries; `'x'` had 171
 
 MD5 hashing solves both: uniform distribution across 256 buckets, and `frozenset` gives O(1) membership testing.
 
 ### Why MD5?
 
-- **Fast** — ~300 ns per hash on modern hardware
-- **Uniform** — excellent distribution for non-cryptographic use
-- **Sufficient** — cryptographic weakness is irrelevant for lookup tables
+- **Fast** - ~300 ns per hash on modern hardware
+- **Uniform** - excellent distribution for non-cryptographic use
+- **Sufficient** - cryptographic weakness is irrelevant for lookup tables
 
 Only the suffix (30 chars) is stored per entry; the 2-char prefix is encoded in the module name, saving ~6% space.
 
@@ -117,7 +117,7 @@ def exists(self, input_text: str) -> bool:
     return False
 ```
 
-**Plural handling note:** strips a trailing `'s'` if the word is longer than 3 characters. Catches regular plurals only — irregular forms (`mice`, `geese`, `children`) are not handled.
+**Plural handling note:** strips a trailing `'s'` if the word is longer than 3 characters. Catches regular plurals only - irregular forms (`mice`, `geese`, `children`) are not handled.
 
 ---
 
@@ -184,7 +184,7 @@ This is intentional and load-bearing:
 suffixes = get_suffixes(word)
 
 if suffixes is None:
-    # word is not in WordNet — discard entirely
+    # word is not in WordNet - discard entirely
 elif suffixes == []:
     # word is in WordNet, morphologically simple
 else:
@@ -290,8 +290,8 @@ suffixes_3a = {
 
 Bloom filters are space-efficient probabilistic sets, but:
 - `frozenset` is already fast enough (~50 ns)
-- Zero false positives — Bloom filters have inherent false positive rate
-- Simpler implementation — no bit manipulation or multiple hash functions
+- Zero false positives - Bloom filters have inherent false positive rate
+- Simpler implementation - no bit manipulation or multiple hash functions
 
 For 88k entries, space savings don't justify the added complexity.
 

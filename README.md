@@ -9,7 +9,7 @@
 
 **Is this token a word? O(1) answer. No setup. No dependencies.**
 
-A simple question deserves a simple answer. This library gives you instant yes/no validation against 88,000 common English words from the Princeton WordNet lexicon — plus morphological suffix extraction.
+A simple question deserves a simple answer. This library gives you instant yes/no validation against 88,000 common English words from the Princeton WordNet lexicon - plus morphological suffix extraction.
 
 ## Quick Start
 
@@ -20,7 +20,7 @@ pip install wordnet-lookup
 ```python
 from wordnet_lookup import is_wordnet_term, get_suffixes
 
-# Word existence — O(1), no I/O
+# Word existence - O(1), no I/O
 is_wordnet_term('alpha')        # True
 is_wordnet_term('waddling')     # True
 is_wordnet_term('myxovirus')    # True
@@ -37,27 +37,27 @@ is_wordnet_term('computers')    # True
 get_suffixes('happiness')       # ['ness']
 get_suffixes('beautifully')     # ['ful', 'ly']
 get_suffixes('nationalized')    # ['al', 'ize', 'ed']
-get_suffixes('cat')             # []   — in WordNet, no derivational suffixes
-get_suffixes('xyz123')          # None — not in WordNet
+get_suffixes('cat')             # []   - in WordNet, no derivational suffixes
+get_suffixes('xyz123')          # None - not in WordNet
 ```
 
 ## Features
 
-- **Zero Dependencies** — Pure Python, no external packages
-- **Zero I/O** — No filesystem access, no database queries
-- **Zero Setup** — No corpus downloads or configuration
-- **Microsecond Lookups** — O(1) hash-based access
-- **Smart Plurals** — Automatically checks singular forms
-- **Unicode Normalization** — Accented forms (e.g. `naïve`, `café`) resolved to ASCII
-- **Suffix Extraction** — `get_suffixes()` returns derivational suffixes in order, or `None` if the word isn't in WordNet
+- **Zero Dependencies** - Pure Python, no external packages
+- **Zero I/O** - No filesystem access, no database queries
+- **Zero Setup** - No corpus downloads or configuration
+- **Microsecond Lookups** - O(1) hash-based access
+- **Smart Plurals** - Automatically checks singular forms
+- **Unicode Normalization** - Accented forms (e.g. `naïve`, `café`) resolved to ASCII
+- **Suffix Extraction** - `get_suffixes()` returns derivational suffixes in order, or `None` if the word isn't in WordNet
 
 ## When to Use This
 
-- **Tokenization filtering** — Keep real words, discard garbage
-- **Input validation** — Reject nonsense in user input
-- **NLP preprocessing** — Filter candidates before expensive operations
-- **Morphological analysis** — Identify suffix chains for stemming pipelines
-- **Data cleaning** — Identify malformed or corrupted text
+- **Tokenization filtering** - Keep real words, discard garbage
+- **Input validation** - Reject nonsense in user input
+- **NLP preprocessing** - Filter candidates before expensive operations
+- **Morphological analysis** - Identify suffix chains for stemming pipelines
+- **Data cleaning** - Identify malformed or corrupted text
 
 ## What This Doesn't Do
 
@@ -86,8 +86,8 @@ Dual-licensed: **MIT** (software) + **Princeton WordNet License** (data). See [L
 
 ## See Also
 
-- **[bnc-lookup](https://github.com/craigtrim/bnc-lookup)** — O(1) lookup using the British National Corpus
-- **[morphroot](https://github.com/craigtrim/morphroot)** — Suffix extraction pipeline that feeds this library
+- **[bnc-lookup](https://github.com/craigtrim/bnc-lookup)** - O(1) lookup using the British National Corpus
+- **[morphroot](https://github.com/craigtrim/morphroot)** - Suffix extraction pipeline that feeds this library
 
 ## Links
 
