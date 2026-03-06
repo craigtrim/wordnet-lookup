@@ -1,19 +1,15 @@
-[tool.poetry]
-
-authors = [
-  "Craig Trim <craigtrim@gmail.com>",
-]
-
-maintainers = [
-  "Craig Trim <craigtrim@gmail.com>",
-]
-
-description = "Static Dictionaries for Rapid Wordnet Lookups"
+[project]
 name = "wordnet-lookup"
+version = "1.3.0"
+description = "Static Dictionaries for Rapid Wordnet Lookups"
 readme = "README.md"
-version = "1.2.6"
 license = "MIT"
-
+authors = [
+  { name = "Craig Trim", email = "craigtrim@gmail.com" },
+]
+maintainers = [
+  { name = "Craig Trim", email = "craigtrim@gmail.com" },
+]
 keywords = [
   "wordnet",
   "lexicon",
@@ -24,9 +20,6 @@ keywords = [
   "validation",
   "linguistics",
 ]
-
-repository = "https://github.com/craigtrim/wordnet-lookup"
-
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
@@ -37,6 +30,13 @@ classifiers = [
   "Natural Language :: English",
   "Operating System :: OS Independent",
 ]
+requires-python = ">=3.7"
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/craigtrim/wordnet-lookup"
+
+[tool.poetry]
 
 [tool.poetry.build]
 generate-setup-file = true
@@ -44,7 +44,7 @@ generate-setup-file = true
 [tool.poetry.dependencies]
 python = "^3.7"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 autopep8 = "*"
 ruff = "*"
 plac = "*"
@@ -59,7 +59,7 @@ requires = ["poetry-core>=1.0.0"]
 line-length = 120
 
 [tool.ruff.lint]
-ignore = ["F403", "F405"]
+ignore = ["F401", "F403", "F405"]
 
 [tool.mypy]
 enable_error_code = [

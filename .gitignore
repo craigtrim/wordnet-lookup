@@ -66,3 +66,6 @@ pypi.key
 .claude
 builder/
 config.sh
+CLAUDE.md
+.claude/
+.ruff_cache/
